@@ -10,5 +10,7 @@ func main(){
 
     fmt.Println("priv = ", priv)
     fmt.Println("pub = ", pub)
+    sample := []byte("myString")
+    rsa.Cipher(pub,sample)
 
 }
