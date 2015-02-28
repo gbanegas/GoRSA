@@ -4,8 +4,16 @@ import (
         "./primes"
         "math"
         "math/big"
+        "math/rand"
+        "time"
         "fmt"
        )
+
+
+
+func randInt(min int, max int) int {
+    return min + rand.Intn(max-min)
+}
 
 type PrivateKey struct {
     p *big.Int
@@ -14,6 +22,7 @@ type PrivateKey struct {
     n *big.Int
 
 }
+
 
 type PublicKey struct {
     n *big.Int
@@ -28,10 +37,11 @@ func getUpperLimit(nthPrime int) int64 {
  
 
 func GenerateKeys() (*PrivateKey, *PublicKey)  {
-    pn := primes.PrimeSieveOfErat(getUpperLimit(10001))
-    fmt.Println(pn[10000])
-    pi := big.NewInt(0)
-    qi := big.NewInt(0)
+    pn := primes.PrimeSieveOfErat(getUpperLimit(999999))
+    rand.Seed( time.Now().UTC().UnixNano())
+    fmt.Println(pn[randInt(len(pn)/2, len(pn))])
+    pi := big.NewInt(pn[randInt(len(pn)/2, len(pn))])
+    qi := big.NewInt(pn[randInt(len(pn)/2, len(pn))])
     di := big.NewInt(0)
     pe := pi.Sub(pi, big.NewInt(1))
     qe := qi.Sub(qi, big.NewInt(1))
