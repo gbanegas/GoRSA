@@ -6,8 +6,9 @@ import (rsa "./rsa"
 
 func main(){
     fmt.Println("Hello, playground")
-    priv := rsa.GeneratePrivateKey()
-    pub := rsa.GeneratePublicKey(priv)
-    fmt.Println("n = ", pub)
+    priv , pub := rsa.GenerateKeys()
+
+    fmt.Println("priv = ", priv)
+    fmt.Println("pub = ", pub)
 
 }

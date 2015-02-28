@@ -14,20 +14,28 @@ type PublicKey struct {
     e *big.Int
 }
 
-func GeneratePrivateKey() (*PrivateKey)  {
+func GenerateKeys() (*PrivateKey, *PublicKey)  {
     pi := big.NewInt(0)
     qi := big.NewInt(0)
     di := big.NewInt(0)
-    return &PrivateKey{p: pi, q: qi, d : di}
+    ni := pi.Mul(pi, qi)
+    ei := big.NewInt(0)
+    return &PrivateKey{p: pi, q: qi, d : di}, &PublicKey{n : ni, e : ei}
     
 }
-func GeneratePublicKey(priv *PrivateKey) (*PublicKey){
-    ni := priv.p.Mul(priv.p, priv.q)
-    ei := big.NewInt(0)
-    return &PublicKey{n : ni, e : ei}
+
+
+/*
+    c = m^e  mod n
+*/
+func Cipher(pub PublicKey, text []byte) {
+
 }
 
-func Cipher(pub PublicKey, s []byte) {
+/*
+    m = c^d mod n
+*/
+func Decipher(priv PrivateKey, cipheredText []byte) {
 
 }
 
