@@ -1,6 +1,8 @@
 package rsa
 
 import (
+        "./primes"
+        "math"
         "math/big"
         "fmt"
        )
@@ -18,7 +20,16 @@ type PublicKey struct {
     e *big.Int
 }
 
+func getUpperLimit(nthPrime int) int64 {
+    n := float64(nthPrime)
+    x := n * math.Log(n) * 1.2
+    return int64(x)
+}
+ 
+
 func GenerateKeys() (*PrivateKey, *PublicKey)  {
+    pn := primes.PrimeSieveOfErat(getUpperLimit(10001))
+    fmt.Println(pn[10000])
     pi := big.NewInt(0)
     qi := big.NewInt(0)
     di := big.NewInt(0)
