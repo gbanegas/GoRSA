@@ -9,6 +9,7 @@ type PrivateKey struct {
     p *big.Int
     q *big.Int
     d *big.Int
+    n *big.Int
 
 }
 
@@ -32,7 +33,7 @@ func GenerateKeys() (*PrivateKey, *PublicKey)  {
     ni := pi.Mul(pi, qi)
     ei := big.NewInt(0)
     fmt.Println("pi = ", pi)
-    return &PrivateKey{p: pi, q: qi, d : di}, &PublicKey{n : ni, e : ei}
+    return &PrivateKey{p: pi, q: qi, d : di,n : ni}, &PublicKey{n : ni, e : ei}
     
 }
 
@@ -40,7 +41,7 @@ func GenerateKeys() (*PrivateKey, *PublicKey)  {
 /*
     c = m^e  mod n
 */
-func Cipher(pub *PublicKey, text []byte) (cipheredText []byte) {
+func Cipher(pub *PublicKey, text []byte) (string) {
     message := ""
     temp := big.NewInt(0)
     m := temp.SetBytes(text);
@@ -50,14 +51,23 @@ func Cipher(pub *PublicKey, text []byte) (cipheredText []byte) {
     /*fmt.Printf("%x ", message[i])*/
     
     fmt.Printf("\n")
-    return nil
+    return message
 }
 
 /*
     m = c^d mod n
 */
-func Decipher(priv PrivateKey, cipheredText []byte) {
-
+func Decipher(priv PrivateKey, cipheredText []byte) (string) {
+    message := ""
+    temp := big.NewInt(0)
+    c := temp.SetBytes(cipheredText);
+    c = c.Exp(c, priv.d, priv.n)
+    message = message + c.String()
+    fmt.Println(message)
+    /*fmt.Printf("%x ", message[i])*/
+    
+    fmt.Printf("\n")
+    return message
 }
 
 
