@@ -113,29 +113,30 @@ func modInverse(a, n *big.Int) (ia *big.Int, ok bool) {
 /*
     c = m^e  mod n
 */
-func Cipher(pub *PublicKey, text []byte) (string) {
-    message := ""
-    temp := big.NewInt(0)
-    m := temp.SetBytes(text);
-    m = m.Exp(m,pub.e, pub.n)
-    message = message + m.String()
+func Cipher(pub *PublicKey, text []byte) ([]byte) {
+    c := new(big.Int)
+    temp := new(big.Int) 
+    temp.SetBytes(text)   
+    fmt.Println("message big int: ", temp)
+    c.Exp(temp, pub.e, pub.n)
+    
     /*fmt.Printf("%x ", message[i])*/
-    return message
+    return c.Bytes()
 }
 
 /*
     m = c^d mod n
 */
-func Decipher(priv *PrivateKey, cipheredText []byte) (string) {
-    message := ""
-    temp := big.NewInt(0)
-    c := temp.SetBytes(cipheredText);
-    c = c.Exp(c, priv.d, priv.n)
-    message = message + c.String()
+func Decipher(priv *PrivateKey, cipheredText []byte) ([]byte) {
+    c := new(big.Int)
+    m := new(big.Int)
+    c.SetBytes(cipheredText)
+    m.Exp(c, priv.d, priv.n)
+   
     /*fmt.Printf("%x ", message[i])*/
     
     fmt.Printf("\n")
-    return message
+    return m.Bytes()
 }
 
 

@@ -1,6 +1,8 @@
 package main
 
-import (rsa "./rsa"
+import (
+        "./rsa"
+        "math/big"
         "fmt"
        )
 
@@ -10,9 +12,13 @@ func main(){
 
     fmt.Println("priv = ", priv)
     fmt.Println("pub = ", pub)
-    sample := []byte("myString")
-    ciphered := rsa.Cipher(pub,sample)
+    sample := big.NewInt(1)
+
+    ciphered := rsa.Cipher(pub,sample.Bytes())
+
+    fmt.Println(ciphered)
     ciphered_bytes := []byte(ciphered)
+
     result := rsa.Decipher(priv, ciphered_bytes)
     fmt.Println("result = ", result)
 
