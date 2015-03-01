@@ -11,6 +11,9 @@ func main(){
     fmt.Println("priv = ", priv)
     fmt.Println("pub = ", pub)
     sample := []byte("myString")
-    rsa.Cipher(pub,sample)
+    ciphered := rsa.Cipher(pub,sample)
+    ciphered_bytes := []byte(ciphered)
+    result := rsa.Decipher(priv, ciphered_bytes)
+    fmt.Println("result = ", result)
 
 }
