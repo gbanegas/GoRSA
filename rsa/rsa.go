@@ -25,7 +25,7 @@ type PublicKey struct {
  
 
 func GenerateKeys() (*PrivateKey, *PublicKey)  {
-    bits := 10
+    bits := 15
     pi, err := rand.Prime(rand.Reader, bits)
     if err != nil {
             fmt.Println(err)
@@ -48,23 +48,18 @@ func GenerateKeys() (*PrivateKey, *PublicKey)  {
     totient := new(big.Int)
     pe.Sub(pe, bigOne)
     qe.Sub(qe, bigOne)
-    fmt.Println("pe = ", pe)
-    fmt.Println("qe = ", qe)
-    fmt.Println("pi = ", pi)
-    fmt.Println("qi = ", qi)
-
     totient.Mul(pe, qe)
-    ni := new(big.Int)
-
-    fmt.Println("tot = ", totient)
-    ni = ni.Mul(pi, qi)
-    ei, err := rand.Int(rand.Reader, ni)
+    
+    /*ei, err := rand.Int(rand.Reader, ni)
      if err != nil {
         fmt.Println(err)
         return nil,nil ;
     }
+    x := new(big.Int)
+    y := new(big.Int)
     for {
-        result :=  qi.GCD(big.NewInt(1), big.NewInt(1), qi, ei)
+         result := new(big.Int)
+         result.GCD(x, y, qi, ei)
         if result.Cmp(bigOne) == 0 { 
             break 
         }
@@ -73,17 +68,19 @@ func GenerateKeys() (*PrivateKey, *PublicKey)  {
             fmt.Println(err)
             return nil,nil
         }
-    }
+    }*/
 
-    di, ok := modInverse(ei, ni)
+    ed := big.NewInt(65537)
+    di, ok := modInverse(ed, totient)
     if !ok {
         return nil, nil
     }
 
-    fmt.Println("e = ", ei)
+    fmt.Println("e = ", ed)
     fmt.Println("pi = ", pi)
     fmt.Println("d = ", di)
-    return &PrivateKey{p: pi, q: qi, d : di, n : ni}, &PublicKey{n : ni, e : ei}
+    fmt.Println("tot = ", totient)
+    return &PrivateKey{p: pi, q: qi, d : di, n : totient}, &PublicKey{n : totient, e : ed}
     
 }
 
@@ -117,6 +114,8 @@ func Cipher(pub *PublicKey, text []byte) ([]byte) {
     c := new(big.Int)
     temp := new(big.Int) 
     temp.SetBytes(text)   
+    fmt.Println("D ", pub.e)
+    fmt.Println("N ", pub.n)
     fmt.Println("message big int: ", temp)
     c.Exp(temp, pub.e, pub.n)
     
@@ -131,6 +130,8 @@ func Decipher(priv *PrivateKey, cipheredText []byte) ([]byte) {
     c := new(big.Int)
     m := new(big.Int)
     c.SetBytes(cipheredText)
+    fmt.Println("D ", priv.d)
+    fmt.Println("N ", priv.n)
     m.Exp(c, priv.d, priv.n)
    
     /*fmt.Printf("%x ", message[i])*/
