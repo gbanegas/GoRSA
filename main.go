@@ -11,8 +11,11 @@ func main(){
     bits := 1024
     priv , pub := rsa.GenerateKeys(bits)
 
-    fmt.Println("private key = ", priv)
-    fmt.Println("public key = ", pub)
+    fmt.Printf("private key : %#v\n", priv)
+    //fmt.Printf("%#v\n", priv)
+    //fmt.Printf("%T\n", priv)
+    //fmt.Printf("%p\n", &priv)
+    fmt.Printf("public key : %#v\n", pub)
 
     sample := big.NewInt(1234)
     fmt.Println("Original plain Text : ", sample)
