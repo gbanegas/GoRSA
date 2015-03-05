@@ -22,10 +22,8 @@ type PublicKey struct {
     e *big.Int
 }
 
- 
-
-func GenerateKeys() (*PrivateKey, *PublicKey)  {
-    bits := 15
+func GenerateKeys(bits int) (*PrivateKey, *PublicKey)  {
+    fmt.Println("Generating keys....... with the size of : ", bits)
     pi, err := rand.Prime(rand.Reader, bits)
     if err != nil {
             fmt.Println(err)
@@ -44,10 +42,13 @@ func GenerateKeys() (*PrivateKey, *PublicKey)  {
     pe := new(big.Int)
     pe.SetBytes(pi.Bytes())
     qe.SetBytes(qi.Bytes())
-
-    totient := new(big.Int)
     pe.Sub(pe, bigOne)
     qe.Sub(qe, bigOne)
+
+    ne := new(big.Int)
+    ne.Mul(pi,qi)
+    
+    totient := new(big.Int)
     totient.Mul(pe, qe)
     
     /*ei, err := rand.Int(rand.Reader, ni)
@@ -75,12 +76,7 @@ func GenerateKeys() (*PrivateKey, *PublicKey)  {
     if !ok {
         return nil, nil
     }
-
-    fmt.Println("e = ", ed)
-    fmt.Println("pi = ", pi)
-    fmt.Println("d = ", di)
-    fmt.Println("tot = ", totient)
-    return &PrivateKey{p: pi, q: qi, d : di, n : totient}, &PublicKey{n : totient, e : ed}
+    return &PrivateKey{p: pi, q: qi, d : di, n : ne}, &PublicKey{n : ne, e : ed}
     
 }
 
@@ -110,16 +106,11 @@ func modInverse(a, n *big.Int) (ia *big.Int, ok bool) {
 /*
     c = m^e  mod n
 */
-func Cipher(pub *PublicKey, text []byte) ([]byte) {
+func Cipher(pub *PublicKey, m []byte) ([]byte) {
     c := new(big.Int)
     temp := new(big.Int) 
-    temp.SetBytes(text)   
-    fmt.Println("D ", pub.e)
-    fmt.Println("N ", pub.n)
-    fmt.Println("message big int: ", temp)
+    temp.SetBytes(m)   
     c.Exp(temp, pub.e, pub.n)
-    
-    /*fmt.Printf("%x ", message[i])*/
     return c.Bytes()
 }
 
@@ -130,13 +121,7 @@ func Decipher(priv *PrivateKey, cipheredText []byte) ([]byte) {
     c := new(big.Int)
     m := new(big.Int)
     c.SetBytes(cipheredText)
-    fmt.Println("D ", priv.d)
-    fmt.Println("N ", priv.n)
     m.Exp(c, priv.d, priv.n)
-   
-    /*fmt.Printf("%x ", message[i])*/
-    
-    fmt.Printf("\n")
     return m.Bytes()
 }
 
