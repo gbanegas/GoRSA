@@ -3,7 +3,9 @@ package rsa
 import (
         "math/big"
         "crypto/rand"
-        "fmt"
+        "io"
+        //"fmt"
+        //"time"
        )
 
 var bigOne = big.NewInt(1)
@@ -22,17 +24,25 @@ type PublicKey struct {
     e *big.Int
 }
 
+var smallPrimes = []uint8{
+    		2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97,
+    }
+var smallPrimesProduct = new(big.Int)
+
+
 func GenerateKeys(bits int) (*PrivateKey, *PublicKey)  {
-    fmt.Println("Generating keys....... with the size of : ", bits)
-    pi, err := rand.Prime(rand.Reader, bits)
+    //fmt.Println("Generating keys....... with the size of : ", bits)
+    //rand.Seed(time.Now().Unix())
+    smallPrimesProduct.SetString("2305567963945518424753102147331756070",10)
+    pi, err := prime(rand.Reader, bits)
     if err != nil {
-            fmt.Println(err)
+            //fmt.Println(err)
             return nil,nil
     }
     qi,err := rand.Prime(rand.Reader, bits)
     for {
         if err != nil {
-            fmt.Println(err)
+            //fmt.Println(err)
             return nil,nil
         }
         if qi.Cmp(pi) != 0 { break }
@@ -123,6 +133,66 @@ func Decipher(priv *PrivateKey, cipheredText []byte) ([]byte) {
     c.SetBytes(cipheredText)
     m.Exp(c, priv.d, priv.n)
     return m.Bytes()
+}
+
+
+func prime(rand io.Reader, bits int) (p *big.Int, err error) {
+ 			b := uint(bits % 8)
+    		if b == 0 {
+    			b = 8
+    		}
+    	
+    		bytes := make([]byte, (bits+7)/8)
+    		p = new(big.Int)
+    	
+    		bigMod := new(big.Int)
+    
+    		for {
+    			_, err = io.ReadFull(rand, bytes)
+    			if err != nil {
+    				return nil, err
+    			}
+    	
+
+    		bytes[0] &= uint8(int(1<<b) - 1)
+
+    			if b >= 2 {
+    				bytes[0] |= 3 << (b - 2)
+    			} else {
+    				// Here b==1, because b cannot be zero.
+    				bytes[0] |= 1
+    				if len(bytes) > 1 {
+    					bytes[1] |= 0x80
+    				}
+    			}
+
+    			bytes[len(bytes)-1] |= 1
+    	
+    			p.SetBytes(bytes)
+    	
+    			bigMod.Mod(p, smallPrimesProduct)
+    			mod := bigMod.Uint64()
+    	
+    		NextDelta:
+    			for delta := uint64(0); delta < 1<<20; delta += 2 {
+    				m := mod + delta
+    				for _, prime := range smallPrimes {
+    					if m%uint64(prime) == 0 && (bits > 6 || m != uint64(prime)) {
+    						continue NextDelta
+    					}
+    				}
+    	
+    				if delta > 0 {
+    					bigMod.SetUint64(delta)
+    					p.Add(p, bigMod)
+    				}
+    				break
+    			}
+    	
+      			if p.ProbablyPrime(20) && p.BitLen() == bits {
+   				return
+   			}
+   		}
 }
 
 
