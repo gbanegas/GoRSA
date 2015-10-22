@@ -11,7 +11,7 @@ import (
 func main(){
     log.Printf("RSA Implementation")
     start_gen := time.Now()
-    bits := 4096
+    bits := 8192
     priv , pub := rsa.GenerateKeys(bits)
     elapsed_gen := time.Since(start_gen)
     log.Printf("Key Generation took %s", elapsed_gen)
